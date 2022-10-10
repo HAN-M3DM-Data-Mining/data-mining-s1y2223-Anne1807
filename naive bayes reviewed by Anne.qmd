@@ -28,8 +28,6 @@ library(e1071)
 ```
 
 
-
-
 ## Data Understanding
 ```{r}
 url <- "https://raw.githubusercontent.com/HAN-M3DM-Data-Mining/data-mining-s1y2223-Anne1807/master/datasets/NB-fakenews.csv"
@@ -41,17 +39,11 @@ spec(rawDF)
 head(rawDF)
 table(rawDF$label)
 ```
-
-
-
-
-
+I removed the "1" because it was c("1","0", "1")
 ```{r}
 rawDF$label <- rawDF$label %>% factor(levels = c("0", "1"), labels = c("Reliable", "Unreliable")) %>% relevel("Reliable")
 class(rawDF$label)
 ```
-
-
 
 
 
@@ -80,6 +72,8 @@ rawCorpus <- Corpus(VectorSource(rawDF$text))
 
 ```
 
+
+I added %>% after tm_map(removePunctuation)
 ```{r}
 inspect(rawCorpus[1:3])
 cleanCorpus <- rawCorpus %>% tm_map(tolower)%>%
@@ -93,6 +87,8 @@ cleanCorpus <- rawCorpus %>% tm_map(tolower)%>%
 cleanDTM <- cleanCorpus %>% DocumentTermMatrix
 inspect(cleanDTM)
 ```
+
+I changed head(rawDF) to head(trainIndex) because it took the wrong data to show
 ```{r}
 set.seed(2345)
 trainIndex <- createDataPartition(rawDF$label, p = .75,
@@ -129,6 +125,8 @@ trainDTM <-  DocumentTermMatrix(trainCorpus, list(dictionary = freqWords))
 testDTM <-  DocumentTermMatrix(testCorpus, list(dictionary = freqWords))
 ```
 
+
+i changed the labels from "reliable" "unreliable" to "no", "yes" because it just needs to say if it is in the data and not of it is reliable or unreliable 
 ```{r}
 convert_counts <- function(x) {
   x <- ifelse(x > 0, 1, 0) %>% factor(levels = c(0,1), labels = c("No", "Yes"))
@@ -142,11 +140,14 @@ head(trainDTM[,1:10])
 ```
 ## Modeling
 
+I changed the word text to label so it first was trainDF$text and I changed it to trainDF$label 
+
 ```{r}
 nbayesModel <-  naiveBayes(trainDTM, trainDF$label, laplace = 1)
 ```
 
 
+I changed positive = "1" to positive = "reliable"
 ```{r}
 predVec <- predict(nbayesModel, testDTM)
 ```
